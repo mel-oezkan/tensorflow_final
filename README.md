@@ -1,7 +1,7 @@
 # tensorflow_final
 
 ## Underlying Math
-> explanation of underlying math
+=> explanation of underlying math
 
 
 ## datasets
