@@ -13,7 +13,7 @@ def create_ellipse(im_size, xPos, yPos, scale, rotation):
     if (xPos < 0 or xPos > 31 or yPos < 0 or yPos > 31 or
         scale < 0 or scale > 5 or rotation < 0 or rotation > 39):
         raise Exception("Ellipse Parameters not in accepted range")
-    
+
     """ Adjust parameters """
     # Stretch of the Ellipse
     stretch = 2
@@ -52,10 +52,10 @@ def generate_continous_params(xPos, dirX, yPos, dirY, scale, dirScale, orientati
     # change direction of change if variables reach limits
     if xPos >= 30: dirX = -1
     if xPos <= 1: dirX = 1
-    
+
     if yPos >= 30: dirY = -1
     if yPos <= 1: dirY = 1
-    
+
     if scale >= 5: dirScale = -1
     if scale <= 0: dirScale = 1
 
@@ -67,23 +67,23 @@ def generate_continous_params(xPos, dirX, yPos, dirY, scale, dirScale, orientati
 
 def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=32, im_size=28]):
     """
-    creates a tf.dataset of correlated ellipses 
-    
+    creates a tf.dataset of correlated ellipses
+
     Args:
         n_trainImages(int)
         n_testImages(int)
         batch_size(int)
-    
+
     Returns:
         train_ds(tf.data)
-        test_ds(tf.data)    
+        test_ds(tf.data)
     """
 
     train_images = []
     xPos, yPos, scale, orient = 0, 0, 0, 0
     dirX, dirY, dirScale, dirOrient = 1, 1, 1, 1
     for _ in range(n_trainImages):
-        # continuous generative factors 
+        # continuous generative factors
         xPos, dirX, yPos, dirY, scale, dirScale, orient, dirOrient = generate_continous_params(xPos, dirX, yPos, dirY, scale, dirScale, orient, dirOrient)
         # generate image and append to list
         train_images.append(create_ellipse(im_size, xPos, yPos, scale, orient))
@@ -102,11 +102,9 @@ def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=3
     test_ds = tf.convert_to_tensor(test_images)
 
     train_ds = tf.expand_dims(train_ds, axis=-1)
-    test_ds = tf.expand_dims(test_ds, axis=-1)    
+    test_ds = tf.expand_dims(test_ds, axis=-1)
 
-    train_ds = train_ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)                
+    train_ds = train_ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)
     test_ds = test_ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
     return train_ds, test_ds
-
-

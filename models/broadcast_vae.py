@@ -178,7 +178,7 @@ class SpatialBroadcastDecoder(tf.keras.layers.Layer):
         return mu_D
 
 
-class VAE(tf.keras.Model):
+class BroadcastVAE(tf.keras.Model):
     """A simple VAE class
 
     Args:
