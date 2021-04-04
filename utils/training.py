@@ -1,11 +1,14 @@
-def kl_divergence_loss(mean, std):
-    kl_divergence = (0.5 * tf.reduce_sum(
-        tf.math.exp(std) + tf.math.square(mean) - 1 - std, axis=1))
+import time 
+import tensorflow as tf
+from tensorflow.keras.utils import Progbar
 
-    return kl_divergence
+from .losses import total_loss
 
 
-def fit(model, data, epochs, metrics=['loss'], save_grads=False):
+def train_step():
+    pass
+
+def fit(model, data, epochs, optimizer, metrics=['loss'], save_params=False):
 
     (train_ds, test_ds, samples) = data
 
@@ -21,7 +24,7 @@ def fit(model, data, epochs, metrics=['loss'], save_grads=False):
 
         # run trough training data
         for train_batch in train_ds:
-            loss, gradients, weights = train_step(model, train_x, optimizer)
+            loss, gradients, weights = train_step(model, train_batch, optimizer, save_params=False)
             train_loss(loss)
 
         end_time = time.time()

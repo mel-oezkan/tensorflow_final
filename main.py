@@ -1,6 +1,8 @@
 import argparse
 import os
 import random
+import numpy as np
+import tensorflow as tf
 
 # from models.beta_vae import BetaVAE
 from utils import load_dataset, training
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     assert dataset in ["ellipse", "fashion-MNIST"], "Selected dataset is not supported"
 
     net = args.decoder
-    assert decoder in ["beta-VAE", "spatial-VAE", "hyperVAE"]
+    assert net in ["beta-VAE", "spatial-VAE", "hyperVAE"]
 
     lr = args.learning_rate
     seed = args.seed
@@ -54,7 +56,7 @@ if __name__ == "__main__":
 
 
     # check for image size of the networks
-    if decoder == "hyperVAE":
+    if net == "hyperVAE":
         im_size = 64
     else:
         im_size = 56
@@ -62,15 +64,15 @@ if __name__ == "__main__":
 
     # define parameters for the network
     model = initalizer(net)
-    optimizer = tf.keras.optimize.Adam(learning_rate=ln)
+    optimizer = tf.keras.optimize.Adam(learning_rate=lr)
 
 
     # load the data as (train_ds, test_ds, samples)
-    data = load_dataset.data(ds=dataset, bs=batch_size, im_size=img_size)
+    data = load_dataset.data(ds=dataset, bs=batch_size, im_size=im_size)
 
 
     # start the training loop
-    training.fit()
+    training.fit(model, )
 
 
 

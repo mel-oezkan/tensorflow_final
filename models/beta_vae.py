@@ -36,6 +36,7 @@ class Encoder(tf.keras.layers.Layer):
             self.latent_dim, activation="relu", name="sigma"
         )
 
+
     def call(self, x, training=False):
         x = self.conv1(x)
         x = self.conv2(x)
@@ -82,6 +83,7 @@ class Decoder(tf.keras.Model):
             kernel_regularizer=l2, bias_regularizer=l2
         )
 
+
     def call(self, x, training=False):
         x = self.inLayer(x)
         x = self.shape(x)
@@ -94,37 +96,37 @@ class Decoder(tf.keras.Model):
 
 
 class BetaVAE(tf.keras.Model):
-  """Disentangled Variational Autoencoder with"""
+    """Disentangled Variational Autoencoder with"""
 
     def __init__(self, latent_dim):
         super(BetaVAE, self).__init__()
         self.latent_dim = latent_dim
 
+        self.name = "beta-VAE"
+
         # Define the model as encoder and decoder
         self.encoder = Encoder(latent_dim=self.latent_dim)
         self.decoder = Decoder()
+
 
     # returns sample from a normal distribution
     @tf.function
     def sample(self, epsilon=None):
         if epsilon is None:
-          epsilon = tf.random.normal(shape=(100, self.latent_dim))
+            epsilon = tf.random.normal(shape=(100, self.latent_dim))
         return self.decode(epsilon, apply_sigmoid=True)
+
 
     # pass data through the encoder
     def encode(self, x, training=False):
         mean, logvar = self.encoder(x, training)
         return mean, logvar
 
-    # reparameterization trick to enable backpropagation
-    def reparameterize(self, mean, std):
-        epsilon = tf.random.normal(shape=mean.shape)
-        return mean + epsilon * (1.0 / 2) * std
 
     # pass data through the decoder
     def decode(self, z, training=False, apply_sigmoid=False):
         logits = self.decoder(z, training)
         if apply_sigmoid:
-          probs = tf.sigmoid(logits)
-          return probs
+            probs = tf.sigmoid(logits)
+            return probs
         return logits

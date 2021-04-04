@@ -1,5 +1,6 @@
-from ellipse_generator import continous_ellipses_data
-
+from .ellipse_generator import continous_ellipses_data
+import tensorflow as tf
+import random
 
 def data(ds="fashion-MNIST", bs=32, im_size=im_size):
 
@@ -23,10 +24,13 @@ def data(ds="fashion-MNIST", bs=32, im_size=im_size):
         test_ds = tf.data.Dataset.from_tensor_slices(test_images)
         test_ds = test_ds.map(lambda img: tf.image.resize(img, [im_size, im_size]))
         test_ds = test_ds.shuffle(10000).batch(bs)
+        test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
 
-        samples =
+        samples = []
+        for _ in range(10):
+            samples.append(random.choice(test_images))
 
     else:
-        train_ds, test_ds, samples = continous_ellipses_data(img_size=img_size)
+        train_ds, test_ds, samples = continous_ellipses_data(img_size=im_size)
 
-    return train_ds, test_ds
+    return train_ds, test_ds, samples

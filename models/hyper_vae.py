@@ -1,4 +1,6 @@
 import tensorflow as tf
+from tensorflow.keras.layers import Conv2D, Flatten, Dense, Conv2DTranspose, Reshape
+import numpy as np
 
 class Encoder(tf.keras.layers.Layer):
     def __init__(self, latent_dims=32, fc_units=256):
@@ -117,7 +119,9 @@ class HyperVAE(tf.keras.Model):
 
         param prior_cov:
         """
-        super(CHyVAE, self).__init__()
+        super(HyperVAE, self).__init__()
+
+        self.name = "hyper-VAE"
 
         self.latent_dims = latent_dims
         self.channels = channels
@@ -134,50 +138,4 @@ class HyperVAE(tf.keras.Model):
 
         self.opt = tf.keras.optimizers.Adam(learning_rate=1e-4)
 
-    def _regularizer(self, z, mu, sig, psi, nu, b):
-        psi_zzT = psi + tf.matmul(z,z, transpose_b=True)
-        mu = tf.expand_dims(mu, -1)
-        sigma_mumuT_psi = sig + tf.matmul(mu, mu, transpose_b=True) + psi
 
-        return -(
-            .5 * (nu +1) * (tf.linalg.logdet(psi_zzT)) +
-            .5 * tf.linalg.logdet(sig) -
-            .5 * (nu + b) * tf.linalg.trace(tf.matmul(sigma_mumuT_psi, tf.linalg.inv(psi_zzT)))
-        )
-
-
-    def compare_reconstuction(self, test_images):
-        n_images = len(test_images)
-
-        for i, img in enumerate(test_images):
-            # reconstruction given the test images
-            # 1. create the latent embedding
-            mu, sig = self._encoder(img)
-
-            scale = tf.linalg.cholesky(sig)
-            mvn = tfp.distributions.MultivariateNormalTriL(
-                    loc=mu, scale_tril=scale)
-
-            z_test = mvn.sample()
-
-            # 2. generate an image from that embedding
-            real_recon = self._decoder(z_test)
-            real_recon = tf.nn.sigmoid(real_recon)
-
-            # generating an image from a random noisy sample
-            rand_noise = sample_noise(self.psi, self.nu, 10)
-            fake_recon = self._decoder(rand_noise)
-            fake_recon = tf.nn.sigmoid(fake_recon)
-
-            plt.subplot(3, n_images, 1+i), plt.axis("off")
-            plt.imshow(img[0, :,:,0], cmap="gray")
-
-            plt.subplot(3, n_images, 1+i+(n_images*1)), plt.axis("off")
-            plt.imshow(real_recon[0, :, :, 0], cmap="gray")
-
-            plt.subplot(3, n_images, 1+i+(n_images*2)), plt.axis("off")
-            plt.imshow(fake_recon[0, :, :, 0], cmap="gray")
-
-        plt.show()
-
-        # return x_recon, fake_recon

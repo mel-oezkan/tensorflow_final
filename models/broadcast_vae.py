@@ -1,6 +1,5 @@
 import tensorflow_probability as tfp
-from tensorflow.python.keras.layers import Input, Dense, Reshape,Conv2DTranspose, Flatten, Conv2D, ReLU, InputLayer
-import datetime
+from tensorflow.python.keras.layers import Dense, Flatten, Conv2D, ReLU, InputLayer
 import tensorflow as tf
 
 class Encoder(tf.keras.layers.Layer):
@@ -139,7 +138,6 @@ class SpatialBroadcastDecoder(tf.keras.layers.Layer):
 
 
         # Reshape tensor
-
         # z_b.shape [batch_size, 56, 56, latent_dim]
         z_b = tf.reshape(z_b, [batch_size, h, w, self.latent_dim])
 
@@ -187,95 +185,25 @@ class BroadcastVAE(tf.keras.Model):
         fixed_var: fixed variance of decoder distribution
     """
 
-    def __init__(self, vae_type, latent_dim):
+    def __init__(self, latent_dim):
         super().__init__()
-        self.vae_type = vae_type
         self.latent_dim = latent_dim
 
-        if self.vae_type == 'Standard':
-            self.decoder = Decoder(latent_dim=latent_dim)
-        else:
-            print("SpatialBroadcastDecoder")
-            self.decoder = SpatialBroadcastDecoder(latent_dim=latent_dim)
-
+        self.decoder = SpatialBroadcastDecoder(latent_dim=latent_dim)
         self.encoder = Encoder(latent_dim=latent_dim)
-
-        self.total_loss_tracker = tf.keras.metrics.Mean(name="total_loss")
-        self.reconstruction_loss_tracker = tf.keras.metrics.Mean(
-            name = "reconstruction_loss"
-        )
-        self.kl_loss_tracker = tf.keras.metrics.Mean(name = "kl_loss")
-
-
-        return
-
-    @property
-    def metrics(self):
-      return [
-              self.total_loss_tracker,
-              self.reconstruction_loss_tracker,
-              self.kl_loss_tracker
-      ]
-
-
-    @staticmethod
-    def criterion(x, x_hat, mean, std):
-
-      fidelity_loss =  _data_fidelity_loss(x, x_hat)
-      kl_loss       =  _kl_divergence_loss(mean, std)
-
-      loss = -data_fidelity_loss + kl_divergence_loss
-
-      losses = {
-          "data_fidelity": tf.math.reduce_mean(fidelity_loss),
-          "kl_divergence": tf.math.reduce_mean(kl_divergence_loss),
-          "loss": tf.math.reduce_mean(loss)
-      }
-
-      return losses
-
-    @staticmethod
-    def _data_fidelity_loss(x, x_hat, eps=1e-10):
-
-      data_fidelity = tfm.reduce_sum(
-          x * tfm.log(eps + x_hat) + (1 - x) * tfm.log(eps + 1 - x_hat),
-          axis=[1,2,3],
-      )
-
-      return data_fidelity
-
-
-    @staticmethod
-    def _kl_divergence_loss(mean, std):
-
-      # compute the kl divergence for each training example and return it
-      kl_divergence = (1 / 2) * tfm.reduce_sum(
-          tfm.exp(std) + tfm.square(mean) - 1 - std,
-          axis=1
-      )
-
-      return kl_divergence
 
 
     @tf.function
     def sample(self, epsilon=None):
-      if epsilon is None:
-        epsilon = tf.random.normal(shape=(100, self.latent_dim))
-      return self.decode(epsilon, apply_sigmoid=True)
+        if epsilon is None:
+            epsilon = tf.random.normal(shape=(100, self.latent_dim))
+        
+        return self.decode(epsilon, apply_sigmoid=True)
 
-
-    def reconstruct(self, x):
-        mu_E, log_var_E = self.encoder(x)
-        x_rec = self.decoder(mu_E)
-        return x_rec
 
     def encode(self, x):
-      mean, logvar = self.encoder.forward(x)
-      return mean, logvar
-
-    def reparameterize(self, mean, std):
-      epsilon = tf.random.normal(shape=mean.shape)
-      return mean + epsilon * (1.0 / 2) * std
+        mean, logvar = self.encoder.forward(x)
+        return mean, logvar
 
 
     def decode(self, z, apply_sigmoid=False):
