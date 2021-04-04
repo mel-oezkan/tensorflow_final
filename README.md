@@ -7,4 +7,3 @@
 ## datasets
 3D chairs: https://github.com/mathieuaubry/seeing3Dchairs/
 
-Something
