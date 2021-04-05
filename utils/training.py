@@ -18,7 +18,7 @@ def train_step(model, input_batch, optimizer, training=True, save_params=False):
     if save_params:
         return loss, gradients, model.trainable_weights
     
-    return loss
+    return loss, None, None
 
 
 def fit(model, data, epochs, optimizer, data_samples, 
@@ -44,9 +44,10 @@ def fit(model, data, epochs, optimizer, data_samples,
         for train_batch in train_ds:
             loss, gradients, weights = train_step(model, train_batch, optimizer, save_params=save_params)
             train_loss(loss)
+
             avg_loss.append(loss)
 
-            pb_i.add(1, values=("loss", np.mean(avg_loss)))
+            pb_i.add(1, values=[("loss", loss)] )
 
         # TensorBoard: Train loss, weights, gradients
         with train_summary_writer.as_default():

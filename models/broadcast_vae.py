@@ -203,12 +203,12 @@ class BroadcastVAE(tf.keras.Model):
         return self.decode(epsilon, apply_sigmoid=True)
 
 
-    def _encode(self, x):
+    def encode(self, x):
         mean, logvar = self.encoder.forward(x)
         return mean, logvar
 
 
-    def _decode(self, z, apply_sigmoid=False):
+    def decode(self, z, apply_sigmoid=False):
         # get decoder distribution parameters
         mu_D = self.decoder(z)
 

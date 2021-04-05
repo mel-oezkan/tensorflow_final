@@ -121,7 +121,7 @@ class HyperVAE(tf.keras.Model):
         """
         super(HyperVAE, self).__init__()
 
-        self.name = "hyper-VAE"
+        self.model_name = "hyper-VAE"
 
         self.latent_dims = latent_dims
         self.channels = channels

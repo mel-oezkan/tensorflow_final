@@ -119,13 +119,13 @@ class BetaVAE(tf.keras.Model):
 
     # pass data through the encoder
     def encode(self, x, training=False):
-        mean, logvar = self.encoder(x=x, training=training)
+        mean, logvar = self.encoder(x, training=training)
         return mean, logvar
 
 
     # pass data through the decoder
     def decode(self, z, training=False, apply_sigmoid=False):
-        logits = self.decoder(z=z, training=training)
+        logits = self.decoder(z, training=training)
         if apply_sigmoid:
             probs = tf.sigmoid(logits)
             return probs
