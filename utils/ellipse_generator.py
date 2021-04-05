@@ -102,10 +102,13 @@ def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=3
             create_ellipse(im_size, xPos, yPos, scale, rotation))
 
     train_ds = tf.convert_to_tensor(train_images)
-    test_ds = tf.convert_to_tensor(test_images)
+    test_images = tf.convert_to_tensor(test_images)
 
-    train_ds = tf.expand_dims(train_ds, axis=-1)
-    test_ds = tf.expand_dims(test_ds, axis=-1)
+    train_images = tf.expand_dims(train_images, axis=-1)
+    test_images = tf.expand_dims(test_images, axis=-1)
+
+    train_ds = tf.data.Dataset.from_tensor_slices(train_images)
+    test_ds = tf.data.Dataset.from_tensor_slices(test_images)
 
     train_ds = train_ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)
     test_ds = test_ds.batch(batch_size).prefetch(tf.data.AUTOTUNE)

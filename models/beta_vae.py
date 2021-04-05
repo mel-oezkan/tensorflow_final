@@ -102,7 +102,7 @@ class BetaVAE(tf.keras.Model):
         super(BetaVAE, self).__init__()
         self.latent_dim = latent_dim
 
-        self.name = "beta-VAE"
+        self.model_name = "beta-VAE"
 
         # Define the model as encoder and decoder
         self.encoder = Encoder(latent_dim=self.latent_dim)
@@ -119,13 +119,13 @@ class BetaVAE(tf.keras.Model):
 
     # pass data through the encoder
     def encode(self, x, training=False):
-        mean, logvar = self.encoder(x, training)
+        mean, logvar = self.encoder(x=x, training=training)
         return mean, logvar
 
 
     # pass data through the decoder
     def decode(self, z, training=False, apply_sigmoid=False):
-        logits = self.decoder(z, training)
+        logits = self.decoder(z=z, training=training)
         if apply_sigmoid:
             probs = tf.sigmoid(logits)
             return probs

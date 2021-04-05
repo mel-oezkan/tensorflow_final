@@ -10,7 +10,7 @@ from tensorboard import notebook
 
 # from models.beta_vae import BetaVAE
 from utils import load_dataset, training
-from models import initalizer
+from models.initalizer import initalize
 
 
 if __name__ == "__main__":
@@ -35,6 +35,9 @@ if __name__ == "__main__":
         "--batch_size", type=int, default=50, help="Random Seed.")
 
     parser.add_argument(
+        "--latent_dims", type=int, default=4, help="Select the latent dimension")
+
+    parser.add_argument(
         "--lr", type=float, default=1e-4,
         help="Learning Rate for the VAE.")
 
@@ -47,15 +50,16 @@ if __name__ == "__main__":
 
 
     # initalize parameters and check if correct
-    dataset = args.dataset
+    dataset = args.data
     assert dataset in ["ellipse", "fashion-MNIST"], "Selected dataset is not supported"
 
     net = args.net
     assert net in ["beta-VAE", "spatial-VAE", "hyperVAE"]
 
     epochs = args.epochs
+    latent_dims = args.latent_dims
     batch_size = args.batch_size
-    lr = args.learning_rate
+    lr = args.lr
     seed = args.seed
 
     
@@ -85,8 +89,8 @@ if __name__ == "__main__":
 
 
     # define parameters for the network
-    model = initalizer(net)
-    optimizer = tf.keras.optimize.Adam(learning_rate=lr)
+    model = initalize(net, latent_dims)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
 
     # load the data as (train_ds, test_ds, samples), (train_samples, test_samples)

@@ -189,6 +189,8 @@ class BroadcastVAE(tf.keras.Model):
         super().__init__()
         self.latent_dim = latent_dim
 
+        self.model_name = "spatial-VAE"
+
         self.decoder = SpatialBroadcastDecoder(latent_dim=latent_dim)
         self.encoder = Encoder(latent_dim=latent_dim)
 
@@ -201,12 +203,12 @@ class BroadcastVAE(tf.keras.Model):
         return self.decode(epsilon, apply_sigmoid=True)
 
 
-    def encode(self, x):
+    def _encode(self, x):
         mean, logvar = self.encoder.forward(x)
         return mean, logvar
 
 
-    def decode(self, z, apply_sigmoid=False):
+    def _decode(self, z, apply_sigmoid=False):
         # get decoder distribution parameters
         mu_D = self.decoder(z)
 

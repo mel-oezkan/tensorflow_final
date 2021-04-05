@@ -33,14 +33,14 @@ def data(ds="fashion-MNIST", bs=32, im_size=28):
         for _ in range(10):
             samples.append(random.choice(test_images))
 
-        assert train_images[0] % bs == 0
-        assert test_images[0] % bs == 0
+        assert train_images.shape[0] % bs == 0
+        assert test_images.shape[0] % bs == 0
 
-        train_samples = train_images[0] / bs
-        test_samples = test_images[0] / bs
+        train_samples = train_images.shape[0] / bs
+        test_samples = test_images.shape[0] / bs
 
     else:
-        train_ds, test_ds, samples = continous_ellipses_data(img_size=im_size, batch_size=bs)
+        train_ds, test_ds, samples = continous_ellipses_data(im_size=im_size, batch_size=bs)
 
         train_samples = 30000 / bs
         test_samples = 5000 / bs

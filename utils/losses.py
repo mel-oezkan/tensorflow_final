@@ -43,18 +43,18 @@ def hyper_loss(model, input_image):
 
 
 @tf.function
-def total_loss(model, input_image, beta=6, training=False):
+def total_loss(model, x, beta=6, training=False):
     
     if model.name == "hyper-VAE":
-        return hyper_loss(hyper_loss, input_image)
+        return hyper_loss(hyper_loss, x)
 
     # get the mean and sigma from the model
-    mean, std = model.encode(input_image, training=training)
+    mean, std = model.encode(x=x, training=training)
 
     z = reparameterize(mean, std)
 
     # Running the latent vector trough the decoder will yield the decoded(/generated) image 
-    x_hat = model.decode(z, training=training)
+    x_hat = model.decode(z=z, training=training)
 
     # reconstruction loss: compare input with output
     fidelity_loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=x_hat, labels=x)
