@@ -79,6 +79,9 @@ def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=3
         test_ds(tf.data)
     """
 
+    assert n_trainImages % batch_size == 0, f"Choose a different batch size. \n {batch_size} does not divide {n_trainImages} without rest"
+    assert n_testImages % batch_size == 0, f"Choose a different batch size. \n {batch_size} does not divide {n_testImages} without rest"
+
     train_images = []
     xPos, yPos, scale, orient = 0, 0, 0, 0
     dirX, dirY, dirScale, dirOrient = 1, 1, 1, 1

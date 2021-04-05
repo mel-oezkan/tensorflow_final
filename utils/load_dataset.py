@@ -2,7 +2,7 @@ from .ellipse_generator import continous_ellipses_data
 import tensorflow as tf
 import random
 
-def data(ds="fashion-MNIST", bs=32, im_size=im_size):
+def data(ds="fashion-MNIST", bs=32, im_size=28):
 
 
     if ds == "fashion-MNIST":
@@ -12,6 +12,9 @@ def data(ds="fashion-MNIST", bs=32, im_size=im_size):
 
         train_images = train_images / 255.0
         test_images = test_images / 255.0
+
+        train_images = tf.convert_to_tensor(train_images)
+        test_images = tf.convert_to_tensor(test_images)
 
         train_images = tf.expand_dims(train_images, -1)
         test_images = tf.expand_dims(test_images, -1)
@@ -30,7 +33,16 @@ def data(ds="fashion-MNIST", bs=32, im_size=im_size):
         for _ in range(10):
             samples.append(random.choice(test_images))
 
-    else:
-        train_ds, test_ds, samples = continous_ellipses_data(img_size=im_size)
+        assert train_images[0] % bs == 0
+        assert test_images[0] % bs == 0
 
-    return train_ds, test_ds, samples
+        train_samples = train_images[0] / bs
+        test_samples = test_images[0] / bs
+
+    else:
+        train_ds, test_ds, samples = continous_ellipses_data(img_size=im_size, batch_size=bs)
+
+        train_samples = 30000 / bs
+        test_samples = 5000 / bs
+
+    return (train_ds, test_ds, samples), (train_samples, test_samples)
