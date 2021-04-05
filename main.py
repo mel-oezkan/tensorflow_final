@@ -21,7 +21,14 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--net", type=str, default="beta-VAE",
-        help="Selct the netowrk: \n beta-VAE || spatial-VAE || hyper-VAE")
+        help="Select the netowrk: \n beta-VAE || spatial-VAE || hyper-VAE")
+
+    parser.add_argument(
+        "--epochs", type=int, default="20",
+        help="Select a epoch size which divides 30000 without rest")
+
+    parser.add_argument(
+        "--batch_size", type=int, default=50, help="Random Seed.")
 
     parser.add_argument(
         "--lr", type=float, default=1e-4,
@@ -30,9 +37,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=42, help="Random Seed.")
 
-    parser.add_argument(
-        "--batch_size", type=int, default=50, help="Random Seed.")
-
+    
 
     args = parser.parse_args()
 
@@ -41,14 +46,15 @@ if __name__ == "__main__":
     dataset = args.dataset
     assert dataset in ["ellipse", "fashion-MNIST"], "Selected dataset is not supported"
 
-    net = args.decoder
+    net = args.net
     assert net in ["beta-VAE", "spatial-VAE", "hyperVAE"]
 
+    epochs = args.epochs
+    batch_size = args.batch_size
     lr = args.learning_rate
     seed = args.seed
 
-    batch_size = args.batch_size
-
+    
 
     # select seeds
     random.seed(seed)
@@ -68,11 +74,11 @@ if __name__ == "__main__":
 
 
     # load the data as (train_ds, test_ds, samples)
-    data = load_dataset.data(ds=dataset, bs=batch_size, im_size=im_size)
+    data, data_lens = load_dataset.data(ds=dataset, bs=batch_size, im_size=im_size)
 
 
     # start the training loop
-    training.fit(model, )
+    training.fit(model, data, epochs, data_lens)
 
 
 

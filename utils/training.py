@@ -39,3 +39,4 @@ def fit(model, data, epochs, optimizer, metrics=['loss'], save_params=False):
 
         # run trough test data
         for test_batch in test_ds:
+            pass
