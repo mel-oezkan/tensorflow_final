@@ -65,7 +65,7 @@ def generate_continous_params(xPos, dirX, yPos, dirY, scale, dirScale, orientati
     return xPos, dirX, yPos, dirY,scale, dirScale, orientation, dirOrient
 
 
-def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=32, im_size=28]):
+def continous_ellipses_data(n_trainImages=30000, n_testImages=5000, batch_size=32, im_size=28):
     """
     creates a tf.dataset of correlated ellipses
 

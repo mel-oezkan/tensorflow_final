@@ -49,7 +49,7 @@ def plot_disentanglement(model, n, latent_dim, digit_size=28):
       plt.show()
 
 
-def generate_and_save_images(model, epoch, test_sample):
+def generate_and_show_images(model, test_sample):
       
       # Forward step
       mean, logvar = model.encode(test_sample)
@@ -58,11 +58,19 @@ def generate_and_save_images(model, epoch, test_sample):
       
       plt.figure(figsize=(4, 4)), plt.gray()
       for i in range(predictions.shape[0]):
-            plt.subplot(4, 4, i + 1)
+            plt.subplot(4, 4, i + 1), plt.axis('off')
             plt.imshow(predictions[i, :, :, 0])
-            plt.axis('off')
+            
 
-            # tight_layout minimizes the overlap between 2 sub-plots
-            plt.show()
+      # tight_layout minimizes the overlap between 2 sub-plots
+      plt.show()
 
       return predictions[i, :, :, 0]
+
+
+# generating images for Tensorboard
+def generate_images(model, test_sample):
+  mean, logvar = model.encode(test_sample, training=False)
+  z = model.reparameterize(mean, logvar)
+  predictions = model.sample(z)
+  return predictions

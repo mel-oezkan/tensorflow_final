@@ -1,8 +1,12 @@
-import argparse
+
 import os
 import random
+import argparse
+import datetime
 import numpy as np
 import tensorflow as tf
+from tensorboard import notebook
+
 
 # from models.beta_vae import BetaVAE
 from utils import load_dataset, training
@@ -16,7 +20,7 @@ if __name__ == "__main__":
         description="Student-t Variational Autoencoder for Robust Density Estimation.")
 
     parser.add_argument(
-        "--data", type=str, default="fashion-MNIST",
+        "--data", type=str, default="ellipse",
         help="Select a dataset: \n ellipse || fashion-MNIST")
 
     parser.add_argument(
@@ -68,17 +72,32 @@ if __name__ == "__main__":
         im_size = 56
 
 
+    # TENSORBOARD
+    # create log file directory
+    current_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    train_log_dir = 'logs/gradient_tape/' + current_time + '/train'
+    test_log_dir = 'logs/gradient_tape/' + current_time + '/test'
+    train_writer = tf.summary.create_file_writer(train_log_dir)
+    test_writer = tf.summary.create_file_writer(test_log_dir)
+    # create directory for images
+    logdir = "logs/image_data/" + current_time
+    image_writer = tf.summary.create_file_writer(logdir)
+
+
     # define parameters for the network
     model = initalizer(net)
     optimizer = tf.keras.optimize.Adam(learning_rate=lr)
 
 
-    # load the data as (train_ds, test_ds, samples)
-    data, data_lens = load_dataset.data(ds=dataset, bs=batch_size, im_size=im_size)
+    # load the data as (train_ds, test_ds, samples), (train_samples, test_samples)
+    data, data_samples = load_dataset.data(ds=dataset, bs=batch_size, im_size=im_size)
 
 
     # start the training loop
-    training.fit(model, data, epochs, data_lens)
+    training.fit(model, data, epochs, optimizer,data_samples,
+        train_writer, test_writer, image_writer)
+
+    notebook.display(port=6006, height=1000)
 
 
 
